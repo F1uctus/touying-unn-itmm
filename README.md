@@ -12,7 +12,7 @@ pixel-accurate backdrops by construction.
 ## Usage
 
 ```typst
-#import "@local/unn-itmm:0.2.0": *
+#import "@local/unn-itmm:0.2.1": *
 
 #show: unn-theme.with(config-info(
   title: [Тема выпускной квалификационной работы],

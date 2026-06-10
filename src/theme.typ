@@ -219,32 +219,33 @@
     config,
   )
   let g = unn-geom.thanks
-  let centered(dy, content) = place(top + left, dy: dy, box(
-    width: 100%,
-    align(center, content),
-  ))
+  let message = text(size: g.size, weight: "bold", fill: white, body)
   let slide-body = {
     title-backdrop
-    centered(g.y, text(size: g.size, weight: "bold", fill: white, body))
-    if qr != none {
-      let card-inset = 8pt
-      let qr-y = g.y + g.height + 16pt
-      centered(qr-y, box(
-        fill: white,
-        radius: 8pt,
-        inset: card-inset,
-        qrcode(qr, width: qr-size, options: (
-          fg-color: self.colors.primary,
-        )),
-      ))
-      if contact != none {
-        centered(
-          qr-y + qr-size + 2 * card-inset + 10pt,
-          text(size: 13pt, fill: white, contact),
-        )
+    if qr == none and contact == none {
+      // The bare template slide: the message keeps its pptx position.
+      place(top + left, dy: g.y, box(width: 100%, align(center, message)))
+    } else {
+      // With extras the whole message + QR + contact block is centered
+      // vertically on the slide.
+      let parts = (message,)
+      if qr != none {
+        parts.push(box(
+          fill: white,
+          radius: 8pt,
+          inset: 8pt,
+          qrcode(qr, width: qr-size, options: (
+            fg-color: self.colors.primary,
+          )),
+        ))
       }
-    } else if contact != none {
-      centered(g.y + g.height + 24pt, text(size: 13pt, fill: white, contact))
+      if contact != none {
+        parts.push(text(size: 13pt, fill: white, contact))
+      }
+      place(center + horizon, stack(
+        spacing: 14pt,
+        ..parts.map(p => align(center, p)),
+      ))
     }
   }
   touying-slide(self: self, slide-body)
