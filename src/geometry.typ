@@ -23,7 +23,8 @@
   // Title layout (slideLayout5): full-slide blue background (title-bg.png)
   // with a full-slide white-logo overlay (logo-strip-white.png, 720 x 405 @ origin).
   title: (
-    // White divider line.
+    // Divider line (assets/divider.png stretched to the shape extent:
+    // faint full-width line, brighter dashes in the middle).
     divider: (x: 26.8pt, y: 213.5pt, width: 657.1pt, height: 2.9pt),
     // "Выпускная квалификационная работа бакалавра".
     subtitle: (x: 26.9pt, y: 99.9pt, width: 460.3pt, size: 16pt),

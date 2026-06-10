@@ -1,6 +1,6 @@
 [package]
 name = "unn-itmm"
-version = "0.1.0"
+version = "0.2.0"
 entrypoint = "lib.typ"
 authors = ["Ilya I. Nikitin <https://github.com/F1uctus>"]
 license = "MIT"

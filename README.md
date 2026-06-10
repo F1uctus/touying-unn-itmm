@@ -12,7 +12,7 @@ pixel-accurate backdrops by construction.
 ## Usage
 
 ```typst
-#import "@local/unn-itmm:0.1.0": *
+#import "@local/unn-itmm:0.2.0": *
 
 #show: unn-theme.with(config-info(
   title: [Тема выпускной квалификационной работы],
@@ -45,7 +45,7 @@ typst compile examples/demo.typ "examples/out/demo-{p}.png" -f png --ppi 144 --r
 |---|---|
 | `slide` | content slide (white, logo strip, title, slide number) |
 | `title-slide` | title layout (layout5 of the pptx) |
-| `thanks-slide` | closing slide ("Спасибо за внимание!", slide 27) |
+| `thanks-slide` | closing slide ("Спасибо за внимание!", slide 27); optional `contact` and `qr` |
 | `focus-slide` / `section-slide` | single centered message on the blue backdrop |
 
 ## Components
@@ -70,7 +70,7 @@ All constants live in `src/geometry.typ` and were read from the pptx XML
 | Content: body box | (29, 126) | 668 x 243 | 21 pt `#3D3D3E` |
 | Content: slide number | (508.5, 375.4) | 175.7 x 21.6 | 9 pt `#888DB0`, right |
 | Content margins | top 126, left 29, right 23, bottom 36 | | |
-| Title: divider line | (26.8, 213.5) | 657.1 x 2.9 | white |
+| Title: divider line | (26.8, 213.5) | 657.1 x 2.9 | assets/divider.png (dashed) |
 | Title: subtitle | (26.9, 99.9) | w 460.3 | 16 pt white |
 | Title: thesis title | (26.9, 137.4) | w 583.1 | 21 pt white |
 | Title: author | (27.5, 241.6) | w 264.1 | 12 pt white |

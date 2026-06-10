@@ -124,4 +124,4 @@
   done: (0, 1),
 )
 
-#thanks-slide(contact: [ivanov\@unn.ru])
+#thanks-slide(contact: [ivanov\@unn.ru], qr: "mailto:ivanov@unn.ru")

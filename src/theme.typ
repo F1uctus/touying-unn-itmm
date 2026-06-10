@@ -3,6 +3,7 @@
 // to the pptx, so every coordinate from src/geometry.typ transfers 1:1.
 
 #import "@preview/touying:0.7.4": *
+#import "@preview/tiaoma:0.3.0": qrcode
 #import "colors.typ": unn-colors
 #import "geometry.typ": unn-geom
 
@@ -116,10 +117,14 @@
   let body = {
     set text(fill: white)
     title-backdrop
-    place(top + left, dx: g.divider.x, dy: g.divider.y, rect(
+    // The divider is a picture in the pptx (media/image1.png stretched to
+    // the shape extent): a faint full-width line with brighter dashes in
+    // the middle. Placing the asset mirrors it exactly.
+    place(top + left, dx: g.divider.x, dy: g.divider.y, image(
+      "../assets/divider.png",
       width: g.divider.width,
       height: g.divider.height,
-      fill: white,
+      fit: "stretch",
     ))
     place(top + left, dx: g.subtitle.x, dy: g.subtitle.y, box(
       width: g.subtitle.width,
@@ -198,9 +203,14 @@
 
 /// Closing slide of the template (slide 27 of the pptx): centered bold
 /// "Спасибо за внимание!" on the title backdrop, optional contact line.
+///
+/// - qr (none, str): when set, a QR code with this data is placed on a
+///   white rounded card above the contact line.
 #let thanks-slide(
   config: (:),
   contact: none,
+  qr: none,
+  qr-size: 80pt,
   body: [Спасибо за внимание!],
 ) = touying-slide-wrapper(self => {
   self = utils.merge-dicts(
@@ -209,17 +219,32 @@
     config,
   )
   let g = unn-geom.thanks
+  let centered(dy, content) = place(top + left, dy: dy, box(
+    width: 100%,
+    align(center, content),
+  ))
   let slide-body = {
     title-backdrop
-    place(top + left, dy: g.y, box(
-      width: 100%,
-      align(center, text(size: g.size, weight: "bold", fill: white, body)),
-    ))
-    if contact != none {
-      place(top + left, dy: g.y + g.height + 24pt, box(
-        width: 100%,
-        align(center, text(size: 13pt, fill: white, contact)),
+    centered(g.y, text(size: g.size, weight: "bold", fill: white, body))
+    if qr != none {
+      let card-inset = 8pt
+      let qr-y = g.y + g.height + 16pt
+      centered(qr-y, box(
+        fill: white,
+        radius: 8pt,
+        inset: card-inset,
+        qrcode(qr, width: qr-size, options: (
+          fg-color: self.colors.primary,
+        )),
       ))
+      if contact != none {
+        centered(
+          qr-y + qr-size + 2 * card-inset + 10pt,
+          text(size: 13pt, fill: white, contact),
+        )
+      }
+    } else if contact != none {
+      centered(g.y + g.height + 24pt, text(size: 13pt, fill: white, contact))
     }
   }
   touying-slide(self: self, slide-body)
