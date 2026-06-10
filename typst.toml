@@ -1,0 +1,10 @@
+[package]
+name = "unn-itmm"
+version = "0.1.0"
+entrypoint = "lib.typ"
+authors = ["Ilya I. Nikitin <https://github.com/F1uctus>"]
+license = "MIT"
+description = "Touying theme reproducing the official UNN (Lobachevsky University) ITMM defense-presentation template"
+repository = "https://github.com/F1uctus/touying-unn-itmm"
+keywords = ["touying", "presentation", "slides", "unn", "itmm"]
+compiler = "0.12.0"
