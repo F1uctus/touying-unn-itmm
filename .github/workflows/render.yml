@@ -1,0 +1,141 @@
+name: Render Typst Documents
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+# A newer push supersedes any in-flight run for the same ref; without this,
+# the older run's README push races the new commit and fails as non-fast-forward.
+concurrency:
+  group: render-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Cache Typst packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/typst
+          key: ${{ runner.os }}-typst-${{ hashFiles('lib.typ', 'src/**', 'examples/**') }}
+          restore-keys: |
+            ${{ runner.os }}-typst-
+
+      - name: Install Typst
+        run: |
+          curl -L https://github.com/typst/typst/releases/download/v0.15.0/typst-x86_64-unknown-linux-musl.tar.xz | tar -xJf -
+          sudo mv typst-x86_64-unknown-linux-musl/typst /usr/local/bin/
+
+      - name: Install Arial
+        run: |
+          echo "ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true" | sudo debconf-set-selections
+          sudo apt-get update
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y ttf-mscorefonts-installer fontconfig
+          sudo fc-cache -f
+          fc-list Arial | head -3
+
+      - name: Compile demo
+        run: |
+          typst compile examples/demo.typ examples/demo.pdf --root .
+          typst compile examples/demo.typ "examples/demo-preview-{p}.svg" --format svg --root .
+
+      - name: Upload PDF
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ github.run_id }}
+          path: examples/demo.pdf
+          retention-days: 7
+
+      - name: Prepare previews
+        run: |
+          mkdir -p previews
+          find examples -name "demo-preview-*.svg" -type f | while read -r file; do
+            name=$(echo "$file" | sed 's|^\./||' | sed 's|/|_|g')
+            cp "$file" "previews/$name"
+          done
+
+      # Release assets are served as application/octet-stream, which browsers
+      # refuse to render as SVG; raw.githubusercontent.com sets image/svg+xml.
+      - name: Publish previews branch
+        if: github.event_name == 'push'
+        run: |
+          cd previews
+          git init -q -b previews
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git config user.name "github-actions[bot]"
+          git add .
+          git commit -qm "Previews for ${{ github.sha }}"
+          git push -qf "https://x-access-token:$GITHUB_TOKEN@github.com/${{ github.repository }}.git" previews
+
+      - name: Update README preview section
+        run: |
+          python3 <<'PY'
+          from pathlib import Path
+          import re
+
+          repo = "${{ github.repository }}"
+          base = f"https://raw.githubusercontent.com/{repo}/previews"
+          prefix = "examples_demo-preview-"
+
+          pages = sorted(
+              Path("examples").glob("demo-preview-*.svg"),
+              key=lambda p: int(p.stem.rsplit("-", 1)[1]),
+          )
+          if not pages:
+              raise SystemExit("no preview SVGs found under examples/")
+
+          def img(page: int) -> str:
+              name = f"{prefix}{page}.svg"
+              return (
+                  f'<img alt="examples/demo.typ — page {page}" '
+                  f'src="{base}/{name}" width="100%">'
+              )
+
+          lines = ["", img(int(pages[0].stem.rsplit("-", 1)[1])), ""]
+          if len(pages) > 1:
+              lines += [
+                  "<details>",
+                  "<summary>Remaining slides</summary>",
+                  "",
+              ]
+              for path in pages[1:]:
+                  page = int(path.stem.rsplit("-", 1)[1])
+                  lines += [img(page), ""]
+              lines.append("</details>")
+              lines.append("")
+
+          section = "\n".join(lines)
+          readme_path = Path("README.md")
+          readme = readme_path.read_text(encoding="utf-8")
+          pattern = r"<!-- preview:start -->.*?<!-- preview:end -->"
+          replacement = f"<!-- preview:start -->{section}<!-- preview:end -->"
+          new_readme, n = re.subn(pattern, replacement, readme, count=1, flags=re.DOTALL)
+          if n != 1:
+              raise SystemExit("expected exactly one <!-- preview:start/end --> pair in README.md")
+          readme_path.write_text(new_readme, encoding="utf-8")
+          PY
+
+      - name: Commit README
+        if: github.event_name == 'push'
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git fetch origin main
+          if [ "$(git rev-parse origin/main)" != "${{ github.sha }}" ]; then
+            echo "main moved past ${{ github.sha }}; the newer run will refresh the README"
+            exit 0
+          fi
+          git add README.md
+          git commit -m "Update README previews" || exit 0
+          git push "https://$GITHUB_TOKEN@github.com/${{ github.repository }}.git" HEAD:main

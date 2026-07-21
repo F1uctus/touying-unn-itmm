@@ -9,6 +9,35 @@ coordinate from the original template transfers 1:1 (PowerPoint pt =
 Typst pt). Full-slide background images extracted from the pptx give
 pixel-accurate backdrops by construction.
 
+## Preview
+
+<!-- preview:start -->
+<img alt="examples/demo.typ — page 1" src="https://raw.githubusercontent.com/F1uctus/touying-unn-itmm/previews/examples_demo-preview-1.svg" width="100%">
+
+<details>
+<summary>Remaining slides</summary>
+
+<img alt="examples/demo.typ — page 2" src="https://raw.githubusercontent.com/F1uctus/touying-unn-itmm/previews/examples_demo-preview-2.svg" width="100%">
+
+<img alt="examples/demo.typ — page 3" src="https://raw.githubusercontent.com/F1uctus/touying-unn-itmm/previews/examples_demo-preview-3.svg" width="100%">
+
+<img alt="examples/demo.typ — page 4" src="https://raw.githubusercontent.com/F1uctus/touying-unn-itmm/previews/examples_demo-preview-4.svg" width="100%">
+
+<img alt="examples/demo.typ — page 5" src="https://raw.githubusercontent.com/F1uctus/touying-unn-itmm/previews/examples_demo-preview-5.svg" width="100%">
+
+<img alt="examples/demo.typ — page 6" src="https://raw.githubusercontent.com/F1uctus/touying-unn-itmm/previews/examples_demo-preview-6.svg" width="100%">
+
+<img alt="examples/demo.typ — page 7" src="https://raw.githubusercontent.com/F1uctus/touying-unn-itmm/previews/examples_demo-preview-7.svg" width="100%">
+
+<img alt="examples/demo.typ — page 8" src="https://raw.githubusercontent.com/F1uctus/touying-unn-itmm/previews/examples_demo-preview-8.svg" width="100%">
+
+<img alt="examples/demo.typ — page 9" src="https://raw.githubusercontent.com/F1uctus/touying-unn-itmm/previews/examples_demo-preview-9.svg" width="100%">
+
+<img alt="examples/demo.typ — page 10" src="https://raw.githubusercontent.com/F1uctus/touying-unn-itmm/previews/examples_demo-preview-10.svg" width="100%">
+
+</details>
+<!-- preview:end -->
+
 ## Usage
 
 ```typst
